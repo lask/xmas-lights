@@ -1,0 +1,7 @@
+prefixes:
+  solar_position: toit-solar-position
+packages:
+  toit-solar-position:
+    url: github.com/toitware/toit-solar-position
+    version: 0.0.3
+    hash: 82c796ae33d0fc7448f0beb4e485485d093e4e29
