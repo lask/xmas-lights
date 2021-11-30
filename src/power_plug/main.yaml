@@ -4,3 +4,5 @@ triggers:
   on_interval: 10m
   on_boot: true
   on_install: true
+  on_pubsub_topic:
+    - "cloud:lau/lighting"
