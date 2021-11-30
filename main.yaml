@@ -1,5 +1,6 @@
 name: "Xmas lights"
 entrypoint: main.toit
 triggers:
+  on_interval: 10m
   on_boot: true
   on_install: true

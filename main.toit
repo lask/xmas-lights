@@ -1,24 +1,31 @@
 
-import gpio 
+import gpio
 import monitor
+import gpio.adc
 
 import solar_position show *
+import device
 
 AARHUS_LATITUDE ::= 56.162939
 AARHUS_LONGITUDE ::= 10.203921
 
-main:
-  pin2 := gpio.Pin 2
-  pin2.config --output
+PIN2 ::= gpio.Pin.out 2
 
-  while true:
-    now := Time.now
-    ti := now.local
-    transitions := sunrise_sunset ti.year ti.month ti.day AARHUS_LONGITUDE AARHUS_LATITUDE
-    midnight := Time.local --year=ti.year --month=ti.month --day=ti.day --h=0
-    six_am := Time.local --year=ti.year --month=ti.month --day=ti.day --h=6
-    if transitions.sunrise + (Duration --h=2) < now < transitions.sunset or midnight < now < six_am:
-      pin2.set 0
-    else:
-      pin2.set 1
-    sleep --ms=60_000
+main:
+  now := Time.now
+  transitions := sunrise_sunset now.local.year now.local.month now.local.day AARHUS_LONGITUDE AARHUS_LATITUDE
+  if transitions.sunrise < now < transitions.sunset:
+    return
+
+  midnight := Time.local --year=now.local.year --month=now.local.month --day=now.local.day --h=0
+  morning := transitions.sunset - (Duration --h=2)
+  if midnight < now < morning:
+    return
+
+  on_duration := now < morning ? now.to morning : now.to midnight
+
+  catch:
+    with_timeout on_duration:
+      PIN2.set 1
+      (monitor.Latch).get
+  PIN2.set 1
